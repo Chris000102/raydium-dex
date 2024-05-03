@@ -1,15 +1,30 @@
-import { Col, Row, Menu } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-import logo from '../assets/logo.svg';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  Col,
+  Menu,
+  Row,
+} from 'antd';
+import {
+  useHistory,
+  useLocation,
+} from 'react-router-dom';
 import styled from 'styled-components';
-import { ENDPOINTS, useConnectionConfig } from '../utils/connection';
-import CustomClusterEndpointDialog from './CustomClusterEndpointDialog';
-import { EndpointInfo } from '../utils/types';
-import { notify } from '../utils/notifications';
-import { Connection } from '@solana/web3.js';
-import WalletConnect from './WalletConnect';
+
+import logo from '../assets/logo.svg';
+import {
+  ENDPOINTS,
+  useConnectionConfig,
+} from '../utils/connection';
+import { ConnectionEx } from '../utils/connectionEx';
 import { getTradePageUrl } from '../utils/markets';
+import { notify } from '../utils/notifications';
+import { EndpointInfo } from '../utils/types';
+import CustomClusterEndpointDialog from './CustomClusterEndpointDialog';
+import WalletConnect from './WalletConnect';
 
 const Wrapper = styled.div`
   // flex-direction: row;
@@ -29,65 +44,60 @@ const LogoWrapper = styled.div`
 `;
 
 const MENU = [
-   {
-    'title': 'Trading',
-    'link': '/',
+  {
+    title: 'Trading',
+    link: '/',
   },
   {
-    'title': 'Swap',
-    'link': 'https://raydium.io/swap/',
+    title: 'Swap',
+    link: 'https://raydium.io/swap/',
   },
   {
-    'title': 'Liquidity',
-    'link': 'https://raydium.io/liquidity/',
+    title: 'Liquidity',
+    link: 'https://raydium.io/liquidity/add/',
   },
   {
-    'title': 'Pools',
-    'link': 'https://raydium.io/pools/',
+    title: 'Pools',
+    link: 'https://raydium.io/pools/',
   },
   {
-    'title': 'Farms',
-    'link': 'https://raydium.io/farms/',
+    title: 'Farms',
+    link: 'https://raydium.io/farms/',
   },
   {
-    'title': 'Staking',
-    'link': 'https://raydium.io/staking/',
+    title: 'Staking',
+    link: 'https://raydium.io/staking/',
   },
   {
-    'title': 'AcceleRaytor',
-    'link': 'https://raydium.io/acceleRaytor/',
+    title: 'AcceleRaytor',
+    link: 'https://v1.raydium.io/acceleRaytor/',
   },
   {
-    'title': 'DropZone',
-    'link': 'https://dropzone.raydium.io/',
+    title: 'DropZone',
+    link: 'https://dropzone.raydium.io/',
   },
   {
-    'title': 'NFTs',
-    'child': [
+    title: 'NFTs',
+    child: [
       {
-        'title': 'Browse NFTs',
-        'link': 'https://nft.raydium.io/marketplace'
+        title: 'Browse NFTs',
+        link: 'https://nft.raydium.io/marketplace',
       },
       {
-        'title': 'Explore Collections',
-        'link': 'https://nft.raydium.io/collections'
+        title: 'Explore Collections',
+        link: 'https://nft.raydium.io/collections',
       },
-    ]
+    ],
   },
   {
-    'title': 'Migrate',
-    'link': 'https://raydium.io/migrate/',
+    title: 'Migrate',
+    link: 'https://raydium.io/migrate/',
   },
-  
-]
+];
 
 export default function TopBar() {
-  const {
-    endpointInfo,
-    setEndpoint,
-    availableEndpoints,
-    setCustomEndpoints,
-  } = useConnectionConfig();
+  const { endpointInfo, setEndpoint, availableEndpoints, setCustomEndpoints } =
+    useConnectionConfig();
   const [addEndpointVisible, setAddEndpointVisible] = useState(false);
   const [testingConnection, setTestingConnection] = useState(false);
   const location = useLocation();
@@ -114,7 +124,7 @@ export default function TopBar() {
     };
 
     try {
-      const connection = new Connection(info.endpoint, 'recent');
+      const connection = ConnectionEx.getInstance(info.endpoint, 'recent');
       connection
         .getEpochInfo()
         .then((result) => {
@@ -149,23 +159,56 @@ export default function TopBar() {
   const tradePageUrl = location.pathname.startsWith('/market/')
     ? location.pathname
     : getTradePageUrl();
-  
-    const { SubMenu } = Menu;
 
-  const menuDiv = 
-  <Menu mode="horizontal" defaultSelectedKeys={['Trading']} style={{fontSize: '16px', display: 'flex', justifyContent: 'center',background: '#0F1429'}} selectable={false} >
-    {MENU.map(item => {
-      if (item.child === undefined) {
-        return <Menu.Item key={item.title}><a href={item.link} target={item.link.startsWith('/') ? '_self' : '_blank'} rel="noopener noreferrer">{item.title}</a></Menu.Item>
-      } else {
-        return <SubMenu key={item.title} title={item.title}>
-          {item.child.map(itemChild => <Menu.Item key={itemChild.title}><a href={itemChild.link} target={itemChild.link.startsWith('/') ? '_self' : '_blank'} rel="noopener noreferrer">{itemChild.title}</a></Menu.Item>)}
-        </SubMenu>
-      }
-    }
-    )}
+  const { SubMenu } = Menu;
+
+  const menuDiv = (
+    <Menu
+      mode="horizontal"
+      defaultSelectedKeys={['Trading']}
+      style={{
+        fontSize: '16px',
+        display: 'flex',
+        justifyContent: 'center',
+        background: '#0F1429',
+      }}
+      selectable={false}
+    >
+      {MENU.map((item) => {
+        if (item.child === undefined) {
+          return (
+            <Menu.Item key={item.title}>
+              <a
+                href={item.link}
+                target={item.link.startsWith('/') ? '_self' : '_blank'}
+                rel="noopener noreferrer"
+              >
+                {item.title}
+              </a>
+            </Menu.Item>
+          );
+        } else {
+          return (
+            <SubMenu key={item.title} title={item.title}>
+              {item.child.map((itemChild) => (
+                <Menu.Item key={itemChild.title}>
+                  <a
+                    href={itemChild.link}
+                    target={itemChild.link.startsWith('/') ? '_self' : '_blank'}
+                    rel="noopener noreferrer"
+                  >
+                    {itemChild.title}
+                  </a>
+                </Menu.Item>
+              ))}
+            </SubMenu>
+          );
+        }
+      })}
     </Menu>
+  );
 
+  const connectWallet = new Date().getTime() / 1000 > 1671012000 ? (<></>) : (<WalletConnect />)
   return (
     <>
       <CustomClusterEndpointDialog
@@ -174,18 +217,21 @@ export default function TopBar() {
         onAddCustomEndpoint={onAddCustomEndpoint}
         onClose={() => setAddEndpointVisible(false)}
       />
-      <Wrapper style={{ background: '#0F1429'}}>
+      <Wrapper style={{ background: '#0F1429' }}>
         <Row wrap={false} style={{ paddingTop: 25, height: 70 }}>
           <Col flex="none">
-            <LogoWrapper onClick={() => history.push(tradePageUrl)} style={{ paddingLeft: 40}}>
+            <LogoWrapper
+              onClick={() => history.push(tradePageUrl)}
+              style={{ paddingLeft: 40 }}
+            >
               <img src={logo} alt="" style={{ width: 145, height: 40 }} />
             </LogoWrapper>
           </Col>
-          <Col flex="auto" style={{ textAlign: 'center'}}>
+          <Col flex="auto" style={{ textAlign: 'center' }}>
             {menuDiv}
           </Col>
-          <Col flex="none" style={{ paddingRight: 20}}>
-            <WalletConnect />
+          <Col flex="none" style={{ paddingRight: 20 }}>
+            {connectWallet}
           </Col>
         </Row>
       </Wrapper>

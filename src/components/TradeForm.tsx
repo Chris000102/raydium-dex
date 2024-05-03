@@ -1,32 +1,52 @@
-import { Button, Col, Input, Row, Select, Slider, Switch } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  Button,
+  Col,
+  Input,
+  Row,
+  Select,
+  Slider,
+  Switch,
+} from 'antd';
+import { SwitchChangeEventHandler } from 'antd/es/switch';
+import tuple from 'immutable-tuple';
+import styled from 'styled-components';
+
+import { PublicKey } from '@solana/web3.js';
+
+import { useSendConnection } from '../utils/connection';
+import { refreshCache } from '../utils/fetch-loop';
 import {
   useFeeDiscountKeys,
   useLocallyStoredFeeDiscountKey,
-  useMarkPrice,
   useMarket,
+  useMarkPrice,
   useSelectedBaseCurrencyAccount,
   useSelectedBaseCurrencyBalances,
   useSelectedOpenOrdersAccount,
   useSelectedQuoteCurrencyAccount,
   useSelectedQuoteCurrencyBalances,
 } from '../utils/markets';
-
-import FloatingElement from './layout/FloatingElement';
-import { SwitchChangeEventHandler } from 'antd/es/switch';
 import { notify } from '../utils/notifications';
-import { refreshCache } from '../utils/fetch-loop';
-import styled from 'styled-components';
-import tuple from 'immutable-tuple';
-import { useSendConnection } from '../utils/connection';
+import {
+  getUnixTs,
+  placeOrder,
+} from '../utils/send';
+import {
+  floorToDecimal,
+  getDecimalCount,
+  roundToDecimal,
+} from '../utils/utils';
 import { useWallet } from '../utils/wallet';
-import {floorToDecimal, getDecimalCount, roundToDecimal,} from '../utils/utils';
-import {getUnixTs, placeOrder} from '../utils/send';
+import FloatingElement from './layout/FloatingElement';
 
 const BuyButton = styled(Button)`
-  margin: 20px 0px 0px 0px;
-  background: #02bf76;
-  border-color: #02bf76;
+  background: rgba(241,241,242,0.75);
+  border-color: rgba(241,241,242,0.75);
 `;
 
 const sliderMarks = {
@@ -97,7 +117,7 @@ export default function TradeForm({
   useEffect(() => {
     const warmUpCache = async () => {
       try {
-        if (!wallet || !wallet.publicKey || !market) {
+        if (!wallet || !wallet.publicKey || !market || wallet.publicKey.equals(PublicKey.default)) {
           console.log(`Skipping refreshing accounts`);
           return;
         }
@@ -445,22 +465,25 @@ export default function TradeForm({
             </Col>
           </Row>
 
+          <div style={{color: '#c93fe7', textAlign: 'center'}}>New orders are disabled.. <a style={{color: '#2abdd2'}} href='https://docs.raydium.io/raydium/updates/serum-dex-deprecation'>Learn more.</a> </div>
+          
           <BuyButton
-            disabled={!price || !baseSize}
-            onClick={onSubmit}
+            // disabled={!price || !baseSize}
+            // onClick={onSubmit}
+            disabled="true"
             block
             type="primary"
             size="large"
             loading={submitting}
             style={{
-              marginTop: 20,
               height: 41,
-              background: 'rgba(90, 196, 190, 0.1)',
-              border: '1px solid #5AC4BE',
+              background:  'rgba(241,241,242,0.1)', // 'rgba(90, 196, 190, 0.1)',
+              border: '1px solid rgba(241,241,242,0.75)',
               borderRadius: 4,
             }}
           >
-            LIMIT {side.toUpperCase()} {baseCurrency}
+            {/* LIMIT {side.toUpperCase()} {baseCurrency} */}
+            New orders disabled
           </BuyButton>
         </div>
       </div>

@@ -1,9 +1,10 @@
 // @ts-nocheck
 import { useMemo } from 'react';
+
 import { USE_MARKETS } from './markets';
 import { sleep } from './utils';
 
-const URL_SERVER = 'https://api.raydium.io/tv/';
+const URL_SERVER = 'https://api.raydium.io/v1/dex/tv/';
 
 export const useTvDataFeed = () => {
   return useMemo(() => makeDataFeed(), []);
@@ -15,6 +16,7 @@ const makeDataFeed = () => {
   const lastReqTime = {}; 
 
   const getApi = async (url: string) => {
+    if (new Date().getTime() / 1000 > 1671012000) return null
     try {
       const response = await fetch(url)
       if (response.ok) {
@@ -118,8 +120,6 @@ const makeDataFeed = () => {
         return
       }
 
-      if (from < 1609459200) from = 1609459200
-      
       const key = `${symbolInfo.market}--${resolution}`
 
       if (overTime[key] && overTime[key] > from) {
